@@ -1,0 +1,22 @@
+<Settings>
+  <Serilog>
+    <Using>
+        <Console>Serilog.Sinks.Console</Console>
+    </Using>
+    <MinimumLevel>
+        <Default>Information</Default>
+    </MinimumLevel>
+    <WriteTo>
+        <ConsoleLogger>
+            <Name>Console</Name>
+            <Args>
+                <theme>Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console</theme>
+                <outputTemplate>[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} - {Message}{NewLine}{Exception}</outputTemplate>
+            </Args>
+        </ConsoleLogger>
+    </WriteTo>
+    <Properties>
+        <Application>XConnect</Application>
+    </Properties>
+  </Serilog>
+</Settings>

@@ -1,0 +1,6 @@
+.env
+*.pfx
+*.zip
+license.xml
+xconnect-client-thumbprint.txt
+*.out

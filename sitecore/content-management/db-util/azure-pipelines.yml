@@ -1,0 +1,31 @@
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - sitecore/content-management/db-util/README.md
+    include:
+    - sitecore/content-management/db-util/*
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+
+- task: Docker@2
+  inputs:
+    displayName: 'Build and Push Container'
+    containerRegistry: 'ICF Next'
+    repository: 'sitecore/content-management/db-util'
+    command: 'buildAndPush'
+    buildContext: "sitecore/content-management/db-util"
+    Dockerfile: 'sitecore/content-management/db-util/Dockerfile'
+    tags: |
+      latest
+      9.1.1-windowsservercore-ltsc2019
+      $(Build.BuildNumber)-windowsservercore-ltsc2019
+
+

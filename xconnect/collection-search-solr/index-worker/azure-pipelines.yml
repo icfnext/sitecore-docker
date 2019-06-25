@@ -1,0 +1,27 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - xconnect/collection-search-solr/index-worker/README.md
+    include:
+    - xconnect/collection-search-solr/index-worker/*
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'ICF Next'
+    repository: 'sitecore/xconnect/collection-search-solr/index-worker'
+    command: 'buildAndPush'
+    buildContext: xconnect/collection-search-solr/index-worker"
+    Dockerfile: 'xconnect/collection-search-solr/index-worker/Dockerfile'
+    tags: |
+      latest
+      9.1.1-windowsservercore-ltsc2019
+      $(Build.BuildNumber)-windowsservercore-ltsc2019

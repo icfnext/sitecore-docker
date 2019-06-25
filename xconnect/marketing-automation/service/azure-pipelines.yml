@@ -1,0 +1,27 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - xconnect/marketing-automation/service/README.md
+    include:
+    - xconnect/marketing-automation/service/*
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'ICF Next'
+    repository: 'sitecore/xconnect/marketing-automation/service'
+    command: 'buildAndPush'
+    buildContext: "xconnect/marketing-automation/service"
+    Dockerfile: 'xconnect/marketing-automation/service/Dockerfile'
+    tags: |
+      latest
+      9.1.1-windowsservercore-ltsc2019
+      $(Build.BuildNumber)-windowsservercore-ltsc2019

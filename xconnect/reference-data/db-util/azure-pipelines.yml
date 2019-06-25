@@ -1,0 +1,27 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - xconnect/reference-data/db-util/README.md
+    include:
+    - xconnect/reference-data/db-util/*
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'ICF Next'
+    repository: 'sitecore/xconnect/reference-data/db-util'
+    command: 'buildAndPush'
+    buildContext: "xconnect/reference-data/db-util"
+    Dockerfile: 'xconnect/reference-data/db-util/Dockerfile'
+    tags: |
+      latest
+      9.1.1-windowsservercore-ltsc2019
+      $(Build.BuildNumber)-windowsservercore-ltsc2019

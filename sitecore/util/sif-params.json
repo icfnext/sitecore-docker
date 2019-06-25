@@ -1,0 +1,225 @@
+{
+    "Parameters": {
+        "CertificateName": {
+            "Type": "String",
+            "Description": "The name of the certificate to be created.",
+            "DefaultValue": ""
+        },
+        "IdentityServerCertificateName": {
+            "Type": "String",
+            "Description": "The name of the certificate to be created.",
+            "DefaultValue": ""
+        },
+        "XConnectCertificateName": {
+            "Type": "String",
+            "Description": "The name of the certificate to be created.",
+            "DefaultValue": ""
+        },
+        "XConnectClientCertificateName": {
+            "Type": "String",
+            "Description": "The name of the certificate to be created.",
+            "DefaultValue": ""
+        },
+        "CertPath": {
+            "Type": "String",
+            "Description": "The physical path on disk where certificates will be stored.",
+            "DefaultValue": "C:\\certificates"
+        },
+        "RootCertFileName": {
+            "Type": "String",
+            "Description": "The file name of the root certificate to be created.",
+            "DefaultValue": "root-cert"
+        },
+        "ExportPassword": {
+            "Type": "String",
+            "Description": "Password to export certificates with.",
+            "DefaultValue": "SIF-Default"
+        }
+    },
+    "Variables": {
+        "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertFileName'))]",
+        "Root.Cert.Store": "Cert:\\LocalMachine\\Root",
+        "Client.Cert.Store": "Cert:\\LocalMachine\\My",
+        "Export.Password": "[if(variable('User.Supplied.Password'),variable('Secure.Password'),variable('Convert.User.Password'))]",
+        "User.Supplied.Password": "[equal(parameter('ExportPassword'),'SIF-Default')]",
+        "Secure.Password": "[ConvertToSecureString(String:variable('Password.String'),AsPlainText:true,Force:true)]",
+        "Password.String": "[parameter('ExportPassword')]",
+        "Convert.User.Password": "[ConvertToSecureString(String:parameter('ExportPassword'),AsPlainText:true,Force:true)]",
+
+        "XConnect.Collection": "[concat(parameter('XConnectCertificateName'), '-collection')]",
+        "XConnect.CollectionSearch": "[concat(parameter('XConnectCertificateName'), '-collection-search')]",
+        "XConnect.ReferenceData": "[concat(parameter('XConnectCertificateName'), '-reference-data')]",
+        "XConnect.MarketingAutomation": "[concat(parameter('XConnectCertificateName'), '-marketing-automation')]",
+        "XConnect.MarketingAutomationReports": "[concat(parameter('XConnectCertificateName'), '-marketing-reporting')]"
+    },
+    "Register": {
+        "Tasks": {
+            "WriteInformation": "Write-Information"
+        },
+        "ConfigFunction": {
+            "ConvertToSecureString": "ConvertTo-SecureString"
+        }
+    },
+    "Tasks": {
+        "CreatePaths": {
+            "Description": "Create the physical disk path.",
+            "Type": "EnsurePath",
+            "Params": {
+                "Exists": [
+                    "[parameter('CertPath')]"
+                ]
+            }
+        },
+        "DisplayPassword": {
+            "Description": "Print password if the user hasn't supplied their own.",
+            "Type": "WriteInformation",
+            "Params": {
+                "Messagedata": "[concat('Certificate Password: ',variable('Password.String'))]",
+                "InformationAction": "Continue"
+            },
+            "Skip": "[not(variable('User.Supplied.Password'))]"
+        },
+        "CreateRootCert": {
+            "Description": "Create the root certificate.",
+            "Type": "NewRootCertificate",
+            "Params": {
+                "Path": "[parameter('CertPath')]",
+                "Name": "[parameter('RootCertFileName')]",
+                "DnsName": [
+                    "[variable('Root.Cert.DnsName')]",
+                    "127.0.0.1"
+                ],
+                "IncludePrivateKey": true,
+                "Password": "[variable('Export.Password')]"
+            }
+        },
+        "CreateIdentityServerSignedCert": {
+            "Description": "Create a certificate signed by the root authority.",
+            "Type": "NewSignedCertificate",
+            "Params": {
+                "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
+                "Path": "[parameter('CertPath')]",
+                "CertStoreLocation": "[variable('Client.Cert.Store')]",
+                "Name": "[parameter('IdentityServerCertificateName')]",
+                "DnsName": [
+                    "[parameter('IdentityServerCertificateName')]",
+                    "127.0.0.1"
+                ],
+                "IncludePrivateKey": true,
+                "Password": "[variable('Export.Password')]"
+            }
+        },
+        "CreateXConnectCollectionSignedCert": {
+            "Description": "Create a certificate signed by the root authority.",
+            "Type": "NewSignedCertificate",
+            "Params": {
+                "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
+                "Path": "[parameter('CertPath')]",
+                "CertStoreLocation": "[variable('Client.Cert.Store')]",
+                "Name":"[variable('XConnect.Collection')]",
+                "DnsName": [
+                    "[variable('XConnect.Collection')]",
+                    "127.0.0.1"
+                ],
+                "IncludePrivateKey": true,
+                "Password": "[variable('Export.Password')]"
+            }
+        },
+        "CreateXConnectCollectionSearchSignedCert": {
+            "Description": "Create a certificate signed by the root authority.",
+            "Type": "NewSignedCertificate",
+            "Params": {
+                "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
+                "Path": "[parameter('CertPath')]",
+                "CertStoreLocation": "[variable('Client.Cert.Store')]",
+                "Name": "[variable('XConnect.CollectionSearch')]",
+                "DnsName": [
+                    "[variable('XConnect.CollectionSearch')]",
+                    "127.0.0.1"
+                ],
+                "IncludePrivateKey": true,
+                "Password": "[variable('Export.Password')]"
+            }
+        },
+        "CreateXConnectReferenceDataSignedCert": {
+            "Description": "Create a certificate signed by the root authority.",
+            "Type": "NewSignedCertificate",
+            "Params": {
+                "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
+                "Path": "[parameter('CertPath')]",
+                "CertStoreLocation": "[variable('Client.Cert.Store')]",
+                "Name": "[variable('XConnect.ReferenceData')]",
+                "DnsName": [
+                    "[variable('XConnect.ReferenceData')]",
+                    "127.0.0.1"
+                ],
+                "IncludePrivateKey": true,
+                "Password": "[variable('Export.Password')]"
+            }
+        },
+        "CreateXConnectMarketingAutomationSignedCert": {
+            "Description": "Create a certificate signed by the root authority.",
+            "Type": "NewSignedCertificate",
+            "Params": {
+                "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
+                "Path": "[parameter('CertPath')]",
+                "CertStoreLocation": "[variable('Client.Cert.Store')]",
+                "Name": "[variable('XConnect.MarketingAutomation')]",
+                "DnsName": [
+                    "[variable('XConnect.MarketingAutomation')]",
+                    "127.0.0.1"
+                ],
+                "IncludePrivateKey": true,
+                "Password": "[variable('Export.Password')]"
+            }
+        },
+        "CreateXConnectMarketingAutomationReportsSignedCert": {
+            "Description": "Create a certificate signed by the root authority.",
+            "Type": "NewSignedCertificate",
+            "Params": {
+                "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
+                "Path": "[parameter('CertPath')]",
+                "CertStoreLocation": "[variable('Client.Cert.Store')]",
+                "Name": "[variable('XConnect.MarketingAutomationReports')]",
+                "DnsName": [
+                    "[variable('XConnect.MarketingAutomationReports')]",
+                    "127.0.0.1"
+                ],
+                "IncludePrivateKey": true,
+                "Password": "[variable('Export.Password')]"
+            }
+        },
+        "CreateXConnectClientSignedCert": {
+            "Description": "Create a certificate signed by the root authority.",
+            "Type": "NewSignedCertificate",
+            "Params": {
+                "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
+                "Path": "[parameter('CertPath')]",
+                "CertStoreLocation": "[variable('Client.Cert.Store')]",
+                "Name": "[parameter('XConnectClientCertificateName')]",
+                "DnsName": [
+                    "[parameter('XConnectClientCertificateName')]",
+                    "127.0.0.1"
+                ],
+                "IncludePrivateKey": true,
+                "Password": "[variable('Export.Password')]"
+            }
+        },
+        "CreateWebsiteSignedCert": {
+            "Description": "Create a certificate signed by the root authority.",
+            "Type": "NewSignedCertificate",
+            "Params": {
+                "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
+                "Path": "[parameter('CertPath')]",
+                "CertStoreLocation": "[variable('Client.Cert.Store')]",
+                "Name": "[parameter('CertificateName')]",
+                "DnsName": [
+                    "[parameter('CertificateName')]",
+                    "127.0.0.1"
+                ],
+                "IncludePrivateKey": true,
+                "Password": "[variable('Export.Password')]"
+            }
+        }
+    }
+}

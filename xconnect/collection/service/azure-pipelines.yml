@@ -1,0 +1,31 @@
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - xconnect/collection/service/README.md
+    include:
+    - xconnect/collection/service/*
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+
+- task: Docker@2
+  inputs:
+    displayName: 'Build and Push Container'
+    containerRegistry: 'ICF Next'
+    repository: 'sitecore/xconnect/collection/service'
+    command: 'buildAndPush'
+    buildContext: "xconnect/collection/service"
+    Dockerfile: 'xconnect/collection/service/Dockerfile'
+    tags: |
+      latest
+      9.1.1-windowsservercore-ltsc2019
+      $(Build.BuildNumber)-windowsservercore-ltsc2019
+
+

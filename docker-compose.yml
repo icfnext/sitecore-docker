@@ -1,0 +1,78 @@
+version: "3.7"
+
+services:
+
+  solr:
+    image: sitecore/solr:latest
+    env_file:
+      - .env
+    ports:
+      - "10443:443"
+    environment:
+      HOST_NAME: "solr"
+
+  xconnect-collection:
+    image: sitecore/xconnect/collection:latest
+    env_file:
+      - .env
+    ports:
+      - "11443:443"
+    environment:
+      HOST_NAME: "xconnect-collection"
+    volumes:
+      - C:\Projects\sitecore-sandbox\certs\:C:\Certificates
+
+  xconnect-collection-search:
+    image: sitecore/xconnect/collection-search-solr:latest
+    env_file:
+      - .env
+    ports:
+      - "12443:443"
+    environment:
+      HOST_NAME: "xconnect-collection-search"
+    volumes:
+      - C:\Projects\sitecore-sandbox\certs\:C:\Certificates
+
+  xconnect-marketing-automation:
+    image: sitecore/xconnect/marketing-automation:latest
+    env_file:
+      - .env
+    ports:
+      - "13443:443"
+    environment:
+      HOST_NAME: "xconnect-marketing-automation"
+    volumes:
+      - C:\Projects\sitecore-sandbox\certs\:C:\Certificates
+
+  xconnect-marketing-reporting:
+    image: sitecore/xconnect/marketing-automation-reporting:latest
+    env_file:
+      - .env
+    ports:
+      - "14443:443"
+    environment:
+      HOST_NAME: "xconnect-marketing-reporting"
+    volumes:
+      - C:\Projects\sitecore-sandbox\certs\:C:\Certificates
+
+  xconnect-reference-data:
+    image: sitecore/xconnect/reference-data:latest
+    env_file:
+      - .env
+    ports:
+      - "15443:443"
+    environment:
+      HOST_NAME: "xconnect-reference-data"
+    volumes:
+      - C:\Projects\sitecore-sandbox\certs\:C:\Certificates
+
+  content-management-website:
+    image: sitecore/content-management/website:latest
+    env_file:
+      - .env
+    ports:
+      - "16443:443"
+    environment:
+      HOST_NAME: "local.sitecore.com"
+    volumes:
+      - C:\Projects\sitecore-sandbox\certs\:C:\Certificates

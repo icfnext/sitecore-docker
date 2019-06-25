@@ -1,0 +1,53 @@
+# Starter pipeline
+
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - sitecore/content-delivery/README.md
+    include:
+    - sitecore/content-delivery/*
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+
+- task: UniversalPackages@0
+  inputs:
+    command: 'download'
+    downloadDirectory: '$(System.DefaultWorkingDirectory)'
+    vstsFeed: 'sitecore'
+    vstsFeedPackage: 'sitecore-xp'
+    vstsPackageVersion: 9.1.1
+
+- task: UniversalPackages@0
+  inputs:
+    command: 'download'
+    downloadDirectory: '$(System.DefaultWorkingDirectory)/sitecore/content-delivery'
+    vstsFeed: 'sitecore'
+    vstsFeedPackage: 'license'
+    vstsPackageVersion: 1.0.0
+
+- task: CmdLine@2
+  inputs:
+    script: 'copy "Sitecore 9.1.1 rev. 002459 (Cloud)_cd.scwdp.zip" $(System.DefaultWorkingDirectory)\sitecore\content-delivery\package.scwdp.zip'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'ICF Next'
+    repository: 'sitecore/content-delivery'
+    command: 'buildAndPush'
+    buildContext: "sitecore/content-delivery"
+    Dockerfile: 'sitecore/content-delivery/Dockerfile'
+    tags: |
+      latest
+      9.1.1-windowsservercore-ltsc2019
+      $(Build.BuildNumber)-windowsservercore-ltsc2019

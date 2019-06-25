@@ -1,0 +1,27 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - solr/solr-win/README.md
+    include:
+    - solr/solr-win/*
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'ICF Next'
+    repository: 'solr-win'
+    command: 'buildAndPush'
+    buildContext: "solr/solr-win"
+    Dockerfile: 'solr/solr-win/Dockerfile'
+    tags: |
+      latest
+      7.2.1-windowsservercore-ltsc2019
+      $(Build.BuildNumber)-windowsservercore-ltsc2019

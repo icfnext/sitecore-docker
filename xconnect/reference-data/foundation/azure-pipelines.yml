@@ -1,0 +1,47 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - xconnect/reference-data/foundation/README.md
+    include:
+    - xconnect/reference-data/foundation/*
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+
+- task: UniversalPackages@0
+  inputs:
+    command: 'download'
+    downloadDirectory: '$(System.DefaultWorkingDirectory)'
+    vstsFeed: 'sitecore'
+    vstsFeedPackage: 'sitecore-xp'
+    vstsPackageVersion: 9.1.1
+
+- task: UniversalPackages@0
+  inputs:
+    command: 'download'
+    downloadDirectory: '$(System.DefaultWorkingDirectory)/xconnect/reference-data/foundation'
+    vstsFeed: 'sitecore'
+    vstsFeedPackage: 'license'
+    vstsPackageVersion: 1.0.0
+
+- task: CmdLine@2
+  inputs:
+    script: 'copy "Sitecore 9.1.1 rev. 002459 (Cloud)_xp1referencedata.scwdp.zip" $(System.DefaultWorkingDirectory)\xconnect\reference-data\foundation\package.scwdp.zip'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'ICF Next'
+    repository: 'sitecore/xconnect/reference-data/foundation'
+    command: 'buildAndPush'
+    buildContext: 'xconnect/reference-data/foundation'
+    Dockerfile: 'xconnect/reference-data/foundation/Dockerfile'
+    tags: |
+      latest
+      9.1.1-windowsservercore-ltsc2019
+      $(Build.BuildNumber)-windowsservercore-ltsc2019
