@@ -1,0 +1,54 @@
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - xconnect/cortex-reporting/db-util/README.md
+    include:
+    - xconnect/cortex-reporting/db-util/*
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+
+- task: UniversalPackages@0
+  inputs:
+    command: 'download'
+    displayName: 'Download Sitecore'
+    downloadDirectory: '$(System.DefaultWorkingDirectory)'
+    vstsFeed: 'sitecore'
+    vstsFeedPackage: 'sitecore-xp'
+    vstsPackageVersion: 9.1.1
+
+- task: UniversalPackages@0
+  inputs:
+    command: 'download'
+    displayName: 'Download License'
+    downloadDirectory: '$(System.DefaultWorkingDirectory)/xconnect/cortex-reporting/db-util'
+    vstsFeed: 'sitecore'
+    vstsFeedPackage: 'license'
+    vstsPackageVersion: 1.0.0
+
+- task: CmdLine@2
+  inputs:
+    displayName: 'Copy Package'
+    script: 'copy "Sitecore 9.1.1 rev. 002459 (Cloud)_xp1collection.scwdp.zip" $(System.DefaultWorkingDirectory)\xconnect\cortex-reporting\db-util\package.scwdp.zip'
+
+- task: Docker@2
+  inputs:
+    displayName: 'Build and Push Container'
+    containerRegistry: 'ICF Next'
+    repository: 'sitecore/xconnect/cortex-reporting/db-util'
+    command: 'buildAndPush'
+    buildContext: "xconnect/cortex-reporting/db-util"
+    Dockerfile: 'xconnect/cortex-reporting/db-util/Dockerfile'
+    tags: |
+      latest
+      9.1.1-windowsservercore-ltsc2019
+      $(Build.BuildNumber)-windowsservercore-ltsc2019
+
+
