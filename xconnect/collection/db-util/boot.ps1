@@ -144,10 +144,10 @@ if ( Test-Path "Env:/KUBERNETES_SERVICE_HOST" ) {
     Invoke-WebRequest `
         -Uri= $uri `
         -Method 'POST' `
-        -Headers @{
-            'Authorization'="Bearer $token";
-            'Accept'='application/json';
-            'Content-Type'='application/json'
+        -Headers @{ `
+            'Authorization'="Bearer $token"; `
+            'Accept'='application/json'; `
+            'Content-Type'='application/json' `
         } `
         -Body $SecretJson
 }
