@@ -48,7 +48,7 @@ $XP1Parameters = @{
     SqlMessagingPassword = $env:SQL_MESSAGING_PASSWORD
 }
 
-#Install-SitecoreConfiguration @XP1Parameters -Skip InstallWDPNoData *>&1 | Tee-Object xp-collection.log
+Install-SitecoreConfiguration @XP1Parameters -Skip InstallWDPNoData *>&1 | Tee-Object xp-collection.log
 
 if ( Test-Path "C:/EnvVarOutput" ) 
 {
@@ -92,9 +92,7 @@ function Create-SqlConnectionString-Secret {
         [string] $Password, 
         [string] $Catalog)
 
-     $CollectionDb = "user id=$UserName;password=$Password;data source=$Server;Initial Catalog=$Catalog"
-
-    return Create-Secret -Name $Name -Value $Foo
+    return "user id=$UserName;password=$Password;data source=$Server;Initial Catalog=$Catalog"
 }
 
 $SecretJson = Create-SqlConnectionString-Secret `
