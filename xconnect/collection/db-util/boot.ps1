@@ -148,6 +148,6 @@ if ( Test-Path "Env:/KUBERNETES_SERVICE_HOST" ) {
             'Authorization'="Bearer $token";
             'Accept'='application/json';
             'Content-Type'='application/json'
-        }
+        } `
         -Body $SecretJson
 }
