@@ -142,7 +142,7 @@ if ( Test-Path "Env:/KUBERNETES_SERVICE_HOST" ) {
     Write-Host $uri
 
     Invoke-WebRequest `
-        -Uri= $uri `
+        -Uri $uri `
         -Method 'POST' `
         -Headers @{ `
             'Authorization'="Bearer $token"; `
