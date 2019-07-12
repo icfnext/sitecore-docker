@@ -137,7 +137,7 @@ if ( Test-Path "Env:/KUBERNETES_SERVICE_HOST" ) {
 
     $namespace = [IO.File]::ReadAllText('C:/var/run/secrets/kubernetes.io/serviceaccount/namespace')
     $token = [IO.File]::ReadAllText('C:/var/run/secrets/kubernetes.io/serviceaccount/token')
-    $uri = "https://kubernetes.default.svc/api/v1/namespaces/$namespace/secrets"
+    $uri = "https://kubernetes.default.svc.cluster.local/api/v1/namespaces/$namespace/secrets"
 
     Write-Host $uri
     Write-Host $token
