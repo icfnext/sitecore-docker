@@ -137,9 +137,12 @@ if ( Test-Path "Env:/KUBERNETES_SERVICE_HOST" ) {
 
     $namespace = [IO.File]::ReadAllText('C:/var/run/secrets/kubernetes.io/serviceaccount/namespace')
     $token = [IO.File]::ReadAllText('C:/var/run/secrets/kubernetes.io/serviceaccount/token')
+    $uri = "https://$env:KUBERNETES_SERVICE_HOST:$env:KUBERNETES_SERVICE_PORT/api/v1/namespaces/$namespace/secrets"
+
+    Write-Host $uri
 
     Invoke-WebRequest `
-        -Uri="https://$env:KUBERNETES_SERVICE_HOST:$env:KUBERNETES_SERVICE_PORT/api/v1/namespaces/$namespace/secrets" `
+        -Uri= $uri `
         -Method 'POST' `
         -Headers @{
             'Authorization'="Bearer $token";
