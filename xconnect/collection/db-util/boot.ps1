@@ -64,4 +64,4 @@ PROCESSING_POOLS_DB=user id=$env:SQL_PROCESSING_POOLS_USER;password=$env:SQL_PRO
 }
 
 ipconfig /all
-nslookup "kubernetes.default.svc.cluster.local"
+nslookup "kubernetes"
