@@ -140,6 +140,7 @@ if ( Test-Path "Env:/KUBERNETES_SERVICE_HOST" ) {
     $uri = "https://$env:KUBERNETES_SERVICE_HOST`:$env:KUBERNETES_SERVICE_PORT/api/v1/namespaces/$namespace/secrets"
 
     Write-Host $uri
+    Write-Host $token
 
     Invoke-WebRequest `
         -Uri $uri `
