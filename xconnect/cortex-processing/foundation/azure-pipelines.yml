@@ -1,0 +1,54 @@
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - xconnect/cortex-processing/foundation/README.md
+    include:
+    - xconnect/cortex-processing/foundation/*
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+
+- task: UniversalPackages@0
+  inputs:
+    command: 'download'
+    displayName: 'Download Sitecore'
+    downloadDirectory: '$(System.DefaultWorkingDirectory)'
+    vstsFeed: 'sitecore'
+    vstsFeedPackage: 'sitecore-xp'
+    vstsPackageVersion: 9.1.1
+
+- task: UniversalPackages@0
+  inputs:
+    command: 'download'
+    displayName: 'Download License'
+    downloadDirectory: '$(System.DefaultWorkingDirectory)/xconnect/cortex-processing/foundation'
+    vstsFeed: 'sitecore'
+    vstsFeedPackage: 'license'
+    vstsPackageVersion: 1.0.0
+
+- task: CmdLine@2
+  inputs:
+    displayName: 'Copy Package'
+    script: 'copy "Sitecore 9.1.1 rev. 002459 (Cloud)_xp1collection.scwdp.zip" $(System.DefaultWorkingDirectory)\xconnect\cortex-processing\foundation\package.scwdp.zip'
+
+- task: Docker@2
+  inputs:
+    displayName: 'Build and Push Container'
+    containerRegistry: 'ICF Next'
+    repository: 'sitecore/xconnect/cortex-processing/foundation'
+    command: 'buildAndPush'
+    buildContext: "xconnect/cortex-processing/foundation"
+    Dockerfile: 'xconnect/cortex-processing/foundation/Dockerfile'
+    tags: |
+      latest
+      9.1.1-windowsservercore-ltsc2019
+      $(Build.BuildNumber)-windowsservercore-ltsc2019
+
+
